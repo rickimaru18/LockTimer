@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">ロックタイマー</string>
+    <string name="app_name_clock">ロックタイマー　-　時計</string>
+    <string name="app_name_timer">ロックタイマー　-　タイマー</string>
+    <string name="app_name_battery">ロックタイマー　-　バッテリー</string>
+    <string name="title_clock">時計</string>
+    <string name="title_timer">タイマー</string>
+    <string name="title_battery">バッテリー</string>
+    <string name="minutes">分</string>
+    <string name="description_clock">画面のロック時間を設定してください。</string>
+    <string name="description_timer">画面のロックタイマーを設定してください。</string>
+    <string name="description_battery">バッテリーに基づいて画面のロックを設定してください。</string>
+
+    <string name="about">アップについて</string>
+    <string name="about_app">ロックタイマーは携帯の画面を自動的にロックできるツールです。</string>
+
+    <string name="credits">Credits:</string>
+    <string name="credits_flaticon">App icon made by Freepik\nhttps://www.flaticon.com/authors/freepik\nfrom www.flaticon.com</string>
+    <string name="credits_fluid_slider">Battery\'s \"Fluid Slider\" UI by\nhttps://www.ramotion.com</string>
+</resources>

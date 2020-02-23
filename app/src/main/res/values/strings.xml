@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">LockTimer</string>
+    <string name="app_name_clock">LockTimer - Clock</string>
+    <string name="app_name_timer">LockTimer - Timer</string>
+    <string name="app_name_battery">LockTimer - Battery</string>
+    <string name="title_clock">Clock</string>
+    <string name="title_timer">Timer</string>
+    <string name="title_battery">Battery</string>
+    <string name="minutes">Minutes</string>
+    <string name="description_clock">Set the time on when will the screen lock.</string>
+    <string name="description_timer">Set the timer on when will the screen lock.</string>
+    <string name="description_battery">Set the battery percentage on when will the screen lock.</string>
+
+    <string name="about">About</string>
+    <string name="about_app">LockTimer is a tool which can automatically lock your phone\'s screen based from the time, timer, or battery percentage.</string>
+
+    <string name="credits">Credits:</string>
+    <string name="credits_flaticon">App icon made by Freepik\nhttps://www.flaticon.com/authors/freepik\nfrom www.flaticon.com</string>
+    <string name="credits_fluid_slider">Battery\'s \"Fluid Slider\" UI by\nhttps://www.ramotion.com</string>
+</resources>

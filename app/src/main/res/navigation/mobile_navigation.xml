@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_clock">
+
+    <fragment
+        android:id="@+id/navigation_clock"
+        android:name="com.xtn.locktimer.ui.clock.ClockFragment"
+        tools:layout="@layout/fragment_clock" />
+<!--        android:label="@string/app_name_clock"-->
+
+    <fragment
+        android:id="@+id/navigation_timer"
+        android:name="com.xtn.locktimer.ui.timer.TimerFragment"
+        tools:layout="@layout/fragment_timer" />
+<!--        android:label="@string/app_name_timer"-->
+
+    <fragment
+        android:id="@+id/navigation_battery"
+        android:name="com.xtn.locktimer.ui.battery.BatteryFragment"
+        tools:layout="@layout/fragment_battery" />
+<!--        android:label="@string/app_name_battery"-->
+</navigation>
