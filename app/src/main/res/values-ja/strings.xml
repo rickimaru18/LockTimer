@@ -10,6 +10,7 @@
     <string name="description_clock">画面のロック時間を設定してください。</string>
     <string name="description_timer">画面のロックタイマーを設定してください。</string>
     <string name="description_battery">バッテリーに基づいて画面のロックを設定してください。</string>
+    <string name="presets">プリセット:</string>
 
     <string name="about">アップについて</string>
     <string name="about_app">ロックタイマーは携帯の画面を自動的にロックできるツールです。</string>

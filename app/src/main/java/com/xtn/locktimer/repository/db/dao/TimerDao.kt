@@ -8,8 +8,11 @@ import com.xtn.locktimer.model.Timer
 @Dao
 interface TimerDao {
 
-    @Query("SELECT * FROM timer")
+    @Query("SELECT * FROM timer ORDER BY id DESC")
     fun getTimers() : LiveData<List<Timer>>
+
+    @Query("SELECT * FROM timer WHERE minutes = :minutes")
+    fun getTimer(minutes: Long) : Timer?
 
     @Insert
     fun insert(timer: Timer)
@@ -19,5 +22,8 @@ interface TimerDao {
 
     @Delete
     fun delete(timer: Timer)
+
+    @Query("DELETE FROM timer WHERE id = (SELECT id FROM timer LIMIT 1)")
+    fun deleteTopRow()
 
 }

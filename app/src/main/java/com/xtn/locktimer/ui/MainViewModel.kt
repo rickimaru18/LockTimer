@@ -70,7 +70,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         updateLockTimerInfo(LockTimerInfo(_isLockTimerStarted.value!!, 1))
         viewModelScope.launch(Dispatchers.IO) {
-            _roomRepo.insert(Timer(minutes))
+            _roomRepo.insertUnique(Timer(minutes)).let { isUnique ->
+                if (!isUnique) _roomRepo.deleteTopRow(Timer.TABLE_NAME)
+            }
         }
 
         WorkerUtil.scheduleScreenLockWorker(getApplication(), minutes)
@@ -86,7 +88,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         updateLockTimerInfo(LockTimerInfo(_isLockTimerStarted.value!!, 2))
         viewModelScope.launch(Dispatchers.IO) {
-            _roomRepo.insert(Battery(battery))
+            _roomRepo.insertUnique(Battery(battery)).let { isUnique ->
+                if (!isUnique) _roomRepo.deleteTopRow(Battery.TABLE_NAME)
+            }
         }
 
         WorkerUtil.scheduleScreenLockWorker(getApplication(), battery)

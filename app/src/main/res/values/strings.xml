@@ -10,6 +10,7 @@
     <string name="description_clock">Set the time on when will the screen lock.</string>
     <string name="description_timer">Set the timer on when will the screen lock.</string>
     <string name="description_battery">Set the battery percentage on when will the screen lock.</string>
+    <string name="presets">Presets:</string>
 
     <string name="about">About</string>
     <string name="about_app">LockTimer is a tool which can automatically lock your phone\'s screen based from the time, timer, or battery percentage.</string>

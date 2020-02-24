@@ -53,6 +53,22 @@ class RoomRepo {
                     LocalTime.now().hour,
                     LocalTime.now().minute
                 ))
+
+                db.timerDao().apply {
+                    insert(Timer(20))
+                    insert(Timer(30))
+                    insert(Timer(50))
+                    insert(Timer(60))
+                    insert(Timer(90))
+                }
+
+                db.batteryDao().apply {
+                    insert(Battery(50))
+                    insert(Battery(40))
+                    insert(Battery(30))
+                    insert(Battery(20))
+                    insert(Battery(10))
+                }
             }
         }
 
@@ -103,6 +119,38 @@ class RoomRepo {
     }
 
     /**
+     * Insert unique data to database.
+     * If not unique, it will delete the old data.
+     *
+     * @param data  [Timer] or [Battery] instance.
+     * @return TRUE if [data] is unique, FALSE otherwise.
+     */
+    fun insertUnique(data: Any) : Boolean {
+        var isUnique = false
+
+        when (data) {
+            is Timer -> {
+                val existData = _timerDao.getTimer(data.minutes)
+                if (existData != null) {
+                    isUnique = true
+                    _timerDao.delete(existData)
+                }
+                insert(data)
+            }
+            is Battery -> {
+                val existData = _batteryDao.getBattery(data.percentage)
+                if (existData != null) {
+                    isUnique = true
+                    _batteryDao.delete(existData)
+                }
+                insert(data)
+            }
+        }
+
+        return isUnique
+    }
+
+    /**
      * Update data in database.
      *
      * @param data  [LockTimerInfo], [Clock], [Timer] or [Battery] instance.
@@ -125,6 +173,18 @@ class RoomRepo {
         when (data) {
             is Timer -> _timerDao.delete(data)
             is Battery -> _batteryDao.delete(data)
+        }
+    }
+
+    /**
+     * Delete top row data in database.
+     *
+     * @param tableName  [Timer.TABLE_NAME] or [Battery.TABLE_NAME].
+     */
+    fun deleteTopRow(tableName: String) {
+        when (tableName) {
+            Timer.TABLE_NAME -> _timerDao.deleteTopRow()
+            Battery.TABLE_NAME -> _batteryDao.deleteTopRow()
         }
     }
 
