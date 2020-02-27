@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.xtn.locktimer.R
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -33,7 +34,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var _timerViewModel: TimerViewModel
     private lateinit var _batteryViewModel: BatteryViewModel
 
+    private lateinit var _navController: NavController
+
     private var _pendingEvent: ((data: Any) -> Unit)? = null
+
+    private var _isSetupDefaultDisplayDone = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +59,7 @@ class MainActivity : AppCompatActivity() {
      * Setup views of this activity.
      */
     private fun setupViews() {
-        val navController = findNavController(R.id.nav_host_fragment)
+        _navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
@@ -64,11 +69,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_battery
             )
         )
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            navController.popBackStack()
+        _navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            _navController.popBackStack()
         }
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        nav_view.setupWithNavController(navController)
+        setupActionBarWithNavController(_navController, appBarConfiguration)
+        nav_view.setupWithNavController(_navController)
     }
 
     /**
@@ -104,6 +109,14 @@ class MainActivity : AppCompatActivity() {
             getLockTimerInfo().observe(this@MainActivity, Observer {
                 if (it == null) return@Observer
                 setIsLockTimerStarted(it.isLockTimerStarted)
+
+                if (!_isSetupDefaultDisplayDone) {
+                    _isSetupDefaultDisplayDone = true
+                    when (it.type) {
+                        1 -> _navController.navigate(R.id.navigation_timer)
+                        2 -> _navController.navigate(R.id.navigation_battery)
+                    }
+                }
             })
         }
     }
