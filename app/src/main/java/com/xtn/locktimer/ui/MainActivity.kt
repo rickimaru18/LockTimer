@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.xtn.locktimer.R
@@ -18,6 +17,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.snackbar.Snackbar
 import com.xtn.locktimer.admin.DeviceAdmin
 import com.xtn.locktimer.ui.battery.BatteryViewModel
 import com.xtn.locktimer.ui.clock.ClockViewModel
@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var _batteryViewModel: BatteryViewModel
 
     private lateinit var _navController: NavController
+    private lateinit var _snackBarStartLockTimer: Snackbar
 
     private var _pendingEvent: ((data: Any) -> Unit)? = null
 
@@ -74,6 +75,12 @@ class MainActivity : AppCompatActivity() {
         }
         setupActionBarWithNavController(_navController, appBarConfiguration)
         nav_view.setupWithNavController(_navController)
+
+        _snackBarStartLockTimer = Snackbar.make(
+            vsnackbar_start_locktimer,
+            "",
+            Snackbar.LENGTH_LONG
+        )
     }
 
     /**
@@ -182,20 +189,21 @@ class MainActivity : AppCompatActivity() {
 
             when (nav_view.selectedItemId) {
                 R.id.navigation_clock -> {
-                    _mainViewModel.startLockTimer(_clockViewModel.convertHoursAndMinutesToClock())
-                    toastMsg = "Locking in ${_clockViewModel.hours.value}:${_clockViewModel.minutes.value}"
+                    val clock = _clockViewModel.convertHoursAndMinutesToClock()
+                    _mainViewModel.startLockTimer(clock)
+                    _snackBarStartLockTimer.setText("Locking in $clock")
                 }
                 R.id.navigation_timer -> {
                     _mainViewModel.startLockTimer(_timerViewModel.minutes.value!!)
-                    toastMsg = "Locking in ${_timerViewModel.minutes.value} minute(s)"
+                    _snackBarStartLockTimer.setText("Locking in ${_timerViewModel.minutes.value} minute(s)")
                 }
                 R.id.navigation_battery -> {
                     _mainViewModel.startLockTimer(_batteryViewModel.battery.value!!)
-                    toastMsg = "Locking when battery is ${_batteryViewModel.battery.value!!}%"
+                    _snackBarStartLockTimer.setText("Locking when battery is ${_batteryViewModel.battery.value!!}%")
                 }
             }
 
-            Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show()
+            _snackBarStartLockTimer.show()
         }
     }
 
