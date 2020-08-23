@@ -1,15 +1,17 @@
 package com.xtn.locktimer.ui.timer
 
-import android.app.Application
 import androidx.lifecycle.*
 import com.xtn.locktimer.model.Timer
 import com.xtn.locktimer.repository.RoomRepo
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class TimerViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val _roomRepo = RoomRepo.getInstance(application)
+@Singleton
+class TimerViewModel @Inject constructor(
+    private val roomRepo: RoomRepo
+) : ViewModel() {
 
     private val _minutes = MutableLiveData<Long>().apply { value = 0 }
 
@@ -31,7 +33,7 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
      * @return List of [Timer].
      */
     fun getTimers() = liveData(Dispatchers.IO) {
-        val res = _roomRepo.getTimers()
+        val res = roomRepo.getTimers()
         emitSource(res)
     }
 

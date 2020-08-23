@@ -4,15 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.xtn.locktimer.model.Battery
 import com.xtn.locktimer.model.Clock
 import com.xtn.locktimer.model.LockTimerInfo
 import com.xtn.locktimer.model.Timer
-import com.xtn.locktimer.repository.db.dao.TimerDao
 import com.xtn.locktimer.repository.db.dao.BatteryDao
 import com.xtn.locktimer.repository.db.dao.ClockDao
 import com.xtn.locktimer.repository.db.dao.LockTimerInfoDao
+import com.xtn.locktimer.repository.db.dao.TimerDao
 
 
 @Database(
@@ -35,19 +34,13 @@ abstract class LockTimerDatabase : RoomDatabase() {
          * @return Singleton instance.
          */
         @Synchronized
-        fun getInstance(context: Context, onCreated: (LockTimerDatabase) -> Unit = {}) : LockTimerDatabase {
+        fun getInstance(context: Context) : LockTimerDatabase {
             if (mInstance == null) {
                 mInstance = Room.databaseBuilder(
                     context.applicationContext,
                     LockTimerDatabase::class.java,
                     "lock_timer_db"
-                ).addCallback(object: RoomDatabase.Callback() {
-
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        onCreated(mInstance!!)
-                    }
-
-                }).build()
+                ).build()
             }
 
             return mInstance!!

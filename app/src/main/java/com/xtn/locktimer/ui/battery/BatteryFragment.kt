@@ -6,18 +6,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.xtn.locktimer.R
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_battery.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class BatteryFragment : Fragment() {
 
-    private var _batteryViewModel: BatteryViewModel? = null
-    private lateinit var _batteryPresetsListAdapter: BatteryPresetsListAdapter
+    @Inject lateinit var batteryViewModel: BatteryViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    @Inject lateinit var batteryPresetsListAdapter: BatteryPresetsListAdapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) : View? {
         return inflater.inflate(R.layout.fragment_battery, container, false)
     }
 
@@ -38,17 +45,16 @@ class BatteryFragment : Fragment() {
             positionListener = { pos ->
                 val posToInt = min + (total  * pos).toInt()
                 bubbleText = "${posToInt}%"
-                _batteryViewModel?.setBattery(posToInt)
+                batteryViewModel.setBattery(posToInt)
             }
             position = 0.0f
             startText ="${min}%"
             endText = "${max}%"
         }
 
-        _batteryPresetsListAdapter = BatteryPresetsListAdapter(requireActivity())
         vrecycler_battery_presets.apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = _batteryPresetsListAdapter
+            adapter = batteryPresetsListAdapter
         }
     }
 
@@ -56,16 +62,14 @@ class BatteryFragment : Fragment() {
      * Setup ViewModels of this fragment.
      */
     private fun setupViewModels() {
-        _batteryViewModel = ViewModelProvider(requireActivity()).get(BatteryViewModel::class.java)
-
-        _batteryViewModel!!.apply {
-            battery.observe(this@BatteryFragment, Observer {
+        batteryViewModel.apply {
+            battery.observe(viewLifecycleOwner, Observer {
                 vslider_battery_percentage.position = it.toFloat() / 100f
             })
 
-            getBatteries().observe(this@BatteryFragment, Observer {
+            getBatteries().observe(viewLifecycleOwner, Observer {
                 if (it.isEmpty()) return@Observer
-                _batteryPresetsListAdapter.setBatteries(it)
+                batteryPresetsListAdapter.setBatteries(it)
                 vslider_battery_percentage.position = it.first().percentage.toFloat() / 100f
             })
         }

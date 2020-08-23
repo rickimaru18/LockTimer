@@ -12,6 +12,10 @@
     <string name="description_battery">バッテリーに基づいて画面のロックを設定してください。</string>
     <string name="presets">プリセット:</string>
 
+    <string name="notification_text">ロック時間：</string>
+    <string name="notification_text_battery">ロック時間（バッテリー％）：</string>
+    <string name="cancel">キャンセル</string>
+
     <string name="about">アップについて</string>
     <string name="about_app">ロックタイマーは携帯の画面を自動的にロックできるツールです。</string>
 

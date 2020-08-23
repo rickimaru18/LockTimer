@@ -1,82 +1,21 @@
 package com.xtn.locktimer.repository
 
-import android.app.Application
 import com.xtn.locktimer.model.Battery
 import com.xtn.locktimer.model.Clock
 import com.xtn.locktimer.model.LockTimerInfo
 import com.xtn.locktimer.model.Timer
 import com.xtn.locktimer.repository.db.LockTimerDatabase
-import com.xtn.locktimer.repository.db.dao.BatteryDao
-import com.xtn.locktimer.repository.db.dao.ClockDao
-import com.xtn.locktimer.repository.db.dao.LockTimerInfoDao
-import com.xtn.locktimer.repository.db.dao.TimerDao
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import java.time.LocalTime
+import javax.inject.Inject
 
 
-class RoomRepo {
+class RoomRepo @Inject constructor(
+    db: LockTimerDatabase
+) {
 
-    private val _lockTimerInfoDao: LockTimerInfoDao
-    private val _clockDao: ClockDao
-    private val _timerDao: TimerDao
-    private val _batteryDao: BatteryDao
-
-    companion object {
-        private var mInstance: RoomRepo? = null
-
-        /**
-         * Get singleton instance.
-         *
-         * @return Singleton instance.
-         */
-        @Synchronized
-        fun getInstance(application: Application) : RoomRepo {
-            if (mInstance == null) {
-                mInstance = RoomRepo(application)
-            }
-            return mInstance!!
-        }
-    }
-
-    private constructor(application: Application) {
-        val db = LockTimerDatabase.getInstance(application.applicationContext) { db ->
-            // on DB created callback
-            GlobalScope.launch(Dispatchers.IO) {
-                db.lockTimerInfoDao().insert(LockTimerInfo(
-                    false,
-                    -1
-                ))
-
-                db.clockDao().insert(Clock(
-                    LocalTime.now().hour,
-                    LocalTime.now().minute
-                ))
-
-                db.timerDao().apply {
-                    insert(Timer(20))
-                    insert(Timer(30))
-                    insert(Timer(50))
-                    insert(Timer(60))
-                    insert(Timer(90))
-                }
-
-                db.batteryDao().apply {
-                    insert(Battery(50))
-                    insert(Battery(40))
-                    insert(Battery(30))
-                    insert(Battery(20))
-                    insert(Battery(10))
-                }
-            }
-        }
-
-        _lockTimerInfoDao = db.lockTimerInfoDao()
-        _clockDao = db.clockDao()
-        _timerDao = db.timerDao()
-        _batteryDao = db.batteryDao()
-    }
+    private val _lockTimerInfoDao = db.lockTimerInfoDao()
+    private val _clockDao = db.clockDao()
+    private val _timerDao = db.timerDao()
+    private val _batteryDao = db.batteryDao()
 
     /**
      * Get [LockTimerInfo] data from database.

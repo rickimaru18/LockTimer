@@ -2,6 +2,8 @@ package com.xtn.locktimer.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.xtn.locktimer.util.Utils
+import java.util.*
 
 
 @Entity(tableName = "clock")
@@ -14,8 +16,9 @@ data class Clock(
     var id: Int = 1
 
     override fun toString(): String {
+        val isJapanese = Utils.isLanguageJapanese()
         val sb = StringBuffer()
-        var amPm = "AM"
+        var amPm = if (isJapanese) "午前" else "AM"
 
         if (hours in 0..11) {
             sb.append(
@@ -27,7 +30,7 @@ data class Clock(
                 if (hours > 12) hours - 12
                 else hours
             )
-            amPm = "PM"
+            amPm = if (isJapanese) "午後" else "PM"
         }
 
         sb.append(":")
@@ -38,7 +41,12 @@ data class Clock(
             sb.append(minutes)
         }
 
-        sb.append(" ").append(amPm)
+        if (isJapanese) {
+            sb.insert(0, amPm)
+        } else {
+            sb.append(" ").append(amPm)
+        }
+
         return sb.toString()
     }
 

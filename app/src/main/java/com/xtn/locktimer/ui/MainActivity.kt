@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.xtn.locktimer.R
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -22,17 +21,21 @@ import com.xtn.locktimer.admin.DeviceAdmin
 import com.xtn.locktimer.ui.battery.BatteryViewModel
 import com.xtn.locktimer.ui.clock.ClockViewModel
 import com.xtn.locktimer.ui.timer.TimerViewModel
+import com.xtn.locktimer.util.Utils
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val REQUEST_ADMIN_ENABLE = 0
 
-    private lateinit var _mainViewModel: MainViewModel
-    private lateinit var _clockViewModel: ClockViewModel
-    private lateinit var _timerViewModel: TimerViewModel
-    private lateinit var _batteryViewModel: BatteryViewModel
+    @Inject lateinit var mainViewModel: MainViewModel
+    @Inject lateinit var clockViewModel: ClockViewModel
+    @Inject lateinit var timerViewModel: TimerViewModel
+    @Inject lateinit var batteryViewModel: BatteryViewModel
 
     private lateinit var _navController: NavController
     private lateinit var _snackBarStartLockTimer: Snackbar
@@ -87,12 +90,7 @@ class MainActivity : AppCompatActivity() {
      * Setup ViewModels of this activity.
      */
     private fun setupViewModels() {
-        _mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        _clockViewModel = ViewModelProvider(this).get(ClockViewModel::class.java)
-        _timerViewModel = ViewModelProvider(this).get(TimerViewModel::class.java)
-        _batteryViewModel = ViewModelProvider(this).get(BatteryViewModel::class.java)
-
-        _mainViewModel.apply {
+        mainViewModel.apply {
             isAdminActive.observe(this@MainActivity, Observer {
                 if (it && _pendingEvent != null) {
                     _pendingEvent?.invoke(isLockTimerStarted.value!!)
@@ -136,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         val deviceAdmin = ComponentName(this, DeviceAdmin::class.java)
 
         if (devicePolicyManager.isAdminActive(deviceAdmin)) {
-            _mainViewModel.setAdminActive(true)
+            mainViewModel.setAdminActive(true)
         } else {
             val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                 putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN , deviceAdmin)
@@ -154,7 +152,7 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode === REQUEST_ADMIN_ENABLE) {
             if (resultCode === Activity.RESULT_OK) {
-                _mainViewModel.setAdminActive(true)
+                mainViewModel.setAdminActive(true)
             }
         }
     }
@@ -176,35 +174,40 @@ class MainActivity : AppCompatActivity() {
      * @param isStarted     TRUE if you want to start the screen lock timer, FALSE otherwise.
      */
     private fun startStopScreenLockTimer(isStarted: Boolean) {
-        if (_mainViewModel.isAdminActive.value == false) {
+        if (mainViewModel.isAdminActive.value == false) {
             requestAdminPolicy()
             _pendingEvent = ::startStopScreenLockTimer as (data: Any) -> Unit
             return
         }
 
         if (isStarted) {
-            _mainViewModel.stopLockTimer()
-        } else {
-            var toastMsg = ""
+            mainViewModel.stopLockTimer()
+            return
+        }
 
-            when (nav_view.selectedItemId) {
-                R.id.navigation_clock -> {
-                    val clock = _clockViewModel.convertHoursAndMinutesToClock()
-                    _mainViewModel.startLockTimer(clock)
-                    _snackBarStartLockTimer.setText("Locking in $clock")
-                }
-                R.id.navigation_timer -> {
-                    _mainViewModel.startLockTimer(_timerViewModel.minutes.value!!)
-                    _snackBarStartLockTimer.setText("Locking in ${_timerViewModel.minutes.value} minute(s)")
-                }
-                R.id.navigation_battery -> {
-                    _mainViewModel.startLockTimer(_batteryViewModel.battery.value!!)
-                    _snackBarStartLockTimer.setText("Locking when battery is ${_batteryViewModel.battery.value!!}%")
+        var snackbarText = ""
+
+        when (nav_view.selectedItemId) {
+            R.id.navigation_clock -> {
+                val clock = clockViewModel.convertHoursAndMinutesToClock()
+                mainViewModel.startLockTimer(clock)
+                snackbarText = "${getString(R.string.notification_text)} $clock"
+            }
+            R.id.navigation_timer -> {
+                mainViewModel.startLockTimer(timerViewModel.minutes.value!!)
+                snackbarText = if (Utils.isLanguageJapanese()) {
+                    "${timerViewModel.minutes.value}分の後ロックします"
+                } else {
+                    "Locking in ${timerViewModel.minutes.value} minute(s)"
                 }
             }
-
-            _snackBarStartLockTimer.show()
+            R.id.navigation_battery -> {
+                mainViewModel.startLockTimer(batteryViewModel.battery.value!!)
+                snackbarText = "${getString(R.string.notification_text_battery)} ${batteryViewModel.battery.value!!}%"
+            }
         }
+
+        _snackBarStartLockTimer.setText(snackbarText).show()
     }
 
     /**

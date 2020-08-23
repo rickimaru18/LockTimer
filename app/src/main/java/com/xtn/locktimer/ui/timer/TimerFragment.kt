@@ -7,22 +7,27 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.xtn.locktimer.R
-import com.xtn.locktimer.util.Logger
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_timer.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class TimerFragment : Fragment() {
 
-    private lateinit var _timerViewModel: TimerViewModel
-    private lateinit var _timerPresetsListAdapter: TimerPresetsListAdapter
+    @Inject lateinit var timerViewModel: TimerViewModel
+
+    @Inject lateinit var timerPresetsListAdapter: TimerPresetsListAdapter
 
     private var _isSetMinutesText = true
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) : View? {
         return inflater.inflate(R.layout.fragment_timer, container, false)
     }
 
@@ -42,14 +47,13 @@ class TimerFragment : Fragment() {
                 if (text?.isBlank()!!) return@addTextChangedListener
 
                 _isSetMinutesText = false
-                _timerViewModel.setMinutes(text.toString().toLong())
+                timerViewModel.setMinutes(text.toString().toLong())
             }
         )
 
-        _timerPresetsListAdapter = TimerPresetsListAdapter(requireActivity())
         vrecycler_timer_presets.apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = _timerPresetsListAdapter
+            adapter = timerPresetsListAdapter
         }
     }
 
@@ -57,19 +61,17 @@ class TimerFragment : Fragment() {
      * Setup ViewModels of this fragment.
      */
     private fun setupViewModels() {
-        _timerViewModel = ViewModelProvider(requireActivity()).get(TimerViewModel::class.java)
-
-        _timerViewModel.apply {
-            minutes.observe(this@TimerFragment, Observer {
+        timerViewModel.apply {
+            minutes.observe(viewLifecycleOwner, Observer {
                 if (it > 0 && _isSetMinutesText) {
                     vedit_minutes.setText(it.toString())
                 }
                 _isSetMinutesText = true
             })
 
-            getTimers().observe(this@TimerFragment, Observer {
+            getTimers().observe(viewLifecycleOwner, Observer {
                 if (it.isEmpty()) return@Observer
-                _timerPresetsListAdapter.setTimers(it)
+                timerPresetsListAdapter.setTimers(it)
                 setMinutes(it.first().minutes)
             })
         }

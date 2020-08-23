@@ -11,17 +11,25 @@ import com.xtn.locktimer.worker.WorkerUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalTime
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val _roomRepo = RoomRepo.getInstance(getApplication())
+@Singleton
+class MainViewModel @Inject constructor(
+    application: Application,
+    private val roomRepo: RoomRepo
+) : AndroidViewModel(application) {
 
     private val _isAdminActive = MutableLiveData<Boolean>().apply { value = false }
     private val _isLockTimerStarted = MutableLiveData<Boolean>().apply { value = false }
 
     val isAdminActive: LiveData<Boolean> = _isAdminActive
     val isLockTimerStarted: LiveData<Boolean> = _isLockTimerStarted
+//        liveData(Dispatchers.IO) {
+//        val res = roomRepo.isLockTimerStarted()
+//        emitSource(res)
+//    }
 
     /**
      * Set value of [isAdminActive].
@@ -48,12 +56,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun startLockTimer(clock: Clock) {
         _isLockTimerStarted.value = true
-
-        updateLockTimerInfo(LockTimerInfo(_isLockTimerStarted.value!!, 0))
         viewModelScope.launch(Dispatchers.IO) {
-            _roomRepo.update(clock)
+            roomRepo.update(LockTimerInfo(_isLockTimerStarted.value!!, 0))
+            roomRepo.update(clock)
         }
-
         WorkerUtil.scheduleScreenLockWorker(
             getApplication(),
             LocalTime.of(clock.hours, clock.minutes)
@@ -67,15 +73,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun startLockTimer(minutes: Long) {
         _isLockTimerStarted.value = true
-
-        updateLockTimerInfo(LockTimerInfo(_isLockTimerStarted.value!!, 1))
         viewModelScope.launch(Dispatchers.IO) {
-            _roomRepo.insertUnique(Timer(minutes)).let { isUnique ->
-                if (!isUnique) _roomRepo.deleteTopRow(Timer.TABLE_NAME)
+            roomRepo.update(LockTimerInfo(_isLockTimerStarted.value!!, 1))
+            roomRepo.insertUnique(Timer(minutes)).let { isUnique ->
+                if (!isUnique) roomRepo.deleteTopRow(Timer.TABLE_NAME)
             }
         }
-
-        WorkerUtil.scheduleScreenLockWorker(getApplication(), minutes)
+        WorkerUtil.scheduleScreenLockWorker(getApplication(), minutes * 60)
     }
 
     /**
@@ -85,14 +89,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun startLockTimer(battery: Int) {
         _isLockTimerStarted.value = true
-
-        updateLockTimerInfo(LockTimerInfo(_isLockTimerStarted.value!!, 2))
         viewModelScope.launch(Dispatchers.IO) {
-            _roomRepo.insertUnique(Battery(battery)).let { isUnique ->
-                if (!isUnique) _roomRepo.deleteTopRow(Battery.TABLE_NAME)
+            roomRepo.update(LockTimerInfo(_isLockTimerStarted.value!!, 2))
+            roomRepo.insertUnique(Battery(battery)).let { isUnique ->
+                if (!isUnique) roomRepo.deleteTopRow(Battery.TABLE_NAME)
             }
         }
-
         WorkerUtil.scheduleScreenLockWorker(getApplication(), battery)
     }
 
@@ -101,11 +103,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun stopLockTimer() {
         _isLockTimerStarted.value = false
-
         viewModelScope.launch(Dispatchers.IO) {
-            _roomRepo.update(LockTimerInfo(false, -1))
+            roomRepo.update(LockTimerInfo(false, -1))
         }
-
         WorkerUtil.stopScreenLockWorker(getApplication())
     }
 
@@ -115,17 +115,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * @return [LockTimerInfo] data.
      */
     fun getLockTimerInfo() = liveData(Dispatchers.IO) {
-        val res = _roomRepo.getLockTimerInfo()
+        val res = roomRepo.getLockTimerInfo()
         emitSource(res)
-    }
-
-    /**
-     * Update [LockTimerInfo] data in database.
-     *
-     * @param lockTimerInfo Updated [LockTimerInfo] data.
-     */
-    fun updateLockTimerInfo(lockTimerInfo: LockTimerInfo) = viewModelScope.launch(Dispatchers.IO) {
-        _roomRepo.update(lockTimerInfo)
     }
 
 }

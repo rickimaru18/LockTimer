@@ -3,17 +3,16 @@ package com.xtn.locktimer.ui.timer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.xtn.locktimer.R
 import com.xtn.locktimer.model.Timer
 import kotlinx.android.synthetic.main.rowitem_presets.view.*
+import javax.inject.Inject
 
 
-class TimerPresetsListAdapter(
-    private val _viewModelStoreOwner: ViewModelStoreOwner
+class TimerPresetsListAdapter @Inject constructor(
+    private val timerViewModel: TimerViewModel
 ) : RecyclerView.Adapter<TimerPresetsListAdapter.TimerPresetsListViewHolder>() {
 
     private var _timers = listOf<Timer>()
@@ -28,12 +27,11 @@ class TimerPresetsListAdapter(
         val rowItem = holder.itemView
         val timer = _timers[position]
 
-        rowItem.vtxt_minutes.text = "${timer.minutes} min(s)"
+        rowItem.vtxt_minutes.text = "${timer.minutes} ${rowItem.context.getString(R.string.minutes)}"
         rowItem.tag = timer.minutes
 
         if (!rowItem.hasOnClickListeners()) {
             rowItem.setOnClickListener {
-                val timerViewModel = ViewModelProvider(_viewModelStoreOwner).get(TimerViewModel::class.java)
                 timerViewModel.setMinutes(it.tag as Long)
             }
         }

@@ -6,16 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.xtn.locktimer.R
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_clock.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class ClockFragment : Fragment() {
 
-    private lateinit var _clockViewModel: ClockViewModel
+    @Inject lateinit var clockViewModel: ClockViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) : View? {
         return inflater.inflate(R.layout.fragment_clock, container, false)
     }
 
@@ -29,8 +35,8 @@ class ClockFragment : Fragment() {
      */
     private fun setupViews() {
         vtimepicker_clock.setOnTimeChangedListener { timePicker, hourOfDay, minute ->
-            _clockViewModel.setHours(hourOfDay)
-            _clockViewModel.setMinutes(minute)
+            clockViewModel.setHours(hourOfDay)
+            clockViewModel.setMinutes(minute)
         }
     }
 
@@ -38,15 +44,13 @@ class ClockFragment : Fragment() {
      * Setup ViewModels of this fragment.
      */
     private fun setupViewModels() {
-        _clockViewModel = ViewModelProvider(requireActivity()).get(ClockViewModel::class.java)
-
-        _clockViewModel.getClock().observe(this, Observer {
+        clockViewModel.getClock().observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 return@Observer
             }
 
-            _clockViewModel.setHours(it.hours)
-            _clockViewModel.setMinutes(it.minutes)
+            clockViewModel.setHours(it.hours)
+            clockViewModel.setMinutes(it.minutes)
             vtimepicker_clock.apply {
                 hour = it?.hours!!
                 minute = it?.minutes!!

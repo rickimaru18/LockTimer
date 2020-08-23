@@ -1,15 +1,17 @@
 package com.xtn.locktimer.ui.battery
 
-import android.app.Application
 import androidx.lifecycle.*
 import com.xtn.locktimer.model.Battery
 import com.xtn.locktimer.repository.RoomRepo
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class BatteryViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val _roomRepo = RoomRepo.getInstance(application)
+@Singleton
+class BatteryViewModel @Inject constructor(
+    private val roomRepo: RoomRepo
+) : ViewModel() {
 
     private val _battery = MutableLiveData<Int>().apply { value = 1 }
 
@@ -31,7 +33,7 @@ class BatteryViewModel(application: Application) : AndroidViewModel(application)
      * @return List of [Battery].
      */
     fun getBatteries() = liveData(Dispatchers.IO) {
-        val res = _roomRepo.getBatteries()
+        val res = roomRepo.getBatteries()
         emitSource(res)
     }
 

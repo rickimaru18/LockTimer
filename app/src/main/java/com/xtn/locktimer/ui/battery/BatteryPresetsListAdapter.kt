@@ -3,17 +3,16 @@ package com.xtn.locktimer.ui.battery
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.xtn.locktimer.R
 import com.xtn.locktimer.model.Battery
 import kotlinx.android.synthetic.main.rowitem_presets.view.*
+import javax.inject.Inject
 
 
-class BatteryPresetsListAdapter(
-    private val _viewModelStoreOwner: ViewModelStoreOwner
+class BatteryPresetsListAdapter @Inject constructor(
+    private val batteryViewModel: BatteryViewModel
 ) : RecyclerView.Adapter<BatteryPresetsListAdapter.BatteryPresetsListViewHolder>() {
 
     private var _batteries = listOf<Battery>()
@@ -33,7 +32,6 @@ class BatteryPresetsListAdapter(
 
         if (!rowItem.hasOnClickListeners()) {
             rowItem.setOnClickListener {
-                val batteryViewModel = ViewModelProvider(_viewModelStoreOwner).get(BatteryViewModel::class.java)
                 batteryViewModel.setBattery(it.tag as Int)
             }
         }
