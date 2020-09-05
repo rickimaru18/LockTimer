@@ -52,6 +52,7 @@ class RoomRepo @Inject constructor(
      */
     fun insert(data: Any) {
         when (data) {
+            is LockTimerInfo -> _lockTimerInfoDao.insert(data)
             is Timer -> _timerDao.insert(data)
             is Battery -> _batteryDao.insert(data)
         }

@@ -94,10 +94,7 @@ class ScreenLockWorker @WorkerInject constructor(
         createNotificationChannel()
 
         val notification = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
-            .setSmallIcon(
-                if (_isTypeBattery) R.drawable.ic_battery_24dp
-                else R.drawable.ic_clock_24dp
-            )
+            .setSmallIcon(R.drawable.ic_lock_24dp)
             .setContentTitle(text)
             .setOngoing(true)
             .setContentIntent(openIntent)

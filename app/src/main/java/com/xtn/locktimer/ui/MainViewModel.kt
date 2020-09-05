@@ -26,10 +26,6 @@ class MainViewModel @Inject constructor(
 
     val isAdminActive: LiveData<Boolean> = _isAdminActive
     val isLockTimerStarted: LiveData<Boolean> = _isLockTimerStarted
-//        liveData(Dispatchers.IO) {
-//        val res = roomRepo.isLockTimerStarted()
-//        emitSource(res)
-//    }
 
     /**
      * Set value of [isAdminActive].
@@ -55,9 +51,8 @@ class MainViewModel @Inject constructor(
      * @param clock Clock instance in which the screen lock will execute.
      */
     fun startLockTimer(clock: Clock) {
-        _isLockTimerStarted.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepo.update(LockTimerInfo(_isLockTimerStarted.value!!, 0))
+            roomRepo.update(LockTimerInfo(true, 0))
             roomRepo.update(clock)
         }
         WorkerUtil.scheduleScreenLockWorker(
@@ -72,9 +67,8 @@ class MainViewModel @Inject constructor(
      * @param minutes   Minutes in which the screen lock will execute.
      */
     fun startLockTimer(minutes: Long) {
-        _isLockTimerStarted.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepo.update(LockTimerInfo(_isLockTimerStarted.value!!, 1))
+            roomRepo.update(LockTimerInfo(true, 1))
             roomRepo.insertUnique(Timer(minutes)).let { isUnique ->
                 if (!isUnique) roomRepo.deleteTopRow(Timer.TABLE_NAME)
             }
@@ -88,9 +82,8 @@ class MainViewModel @Inject constructor(
      * @param battery   Battery percentage in which the screen lock will execute.
      */
     fun startLockTimer(battery: Int) {
-        _isLockTimerStarted.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepo.update(LockTimerInfo(_isLockTimerStarted.value!!, 2))
+            roomRepo.update(LockTimerInfo(true, 2))
             roomRepo.insertUnique(Battery(battery)).let { isUnique ->
                 if (!isUnique) roomRepo.deleteTopRow(Battery.TABLE_NAME)
             }
@@ -102,7 +95,6 @@ class MainViewModel @Inject constructor(
      * Stop lock timer.
      */
     fun stopLockTimer() {
-        _isLockTimerStarted.value = false
         viewModelScope.launch(Dispatchers.IO) {
             roomRepo.update(LockTimerInfo(false, -1))
         }
