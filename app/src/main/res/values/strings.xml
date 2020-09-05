@@ -16,6 +16,8 @@
     <string name="notification_text_battery">Locking phone when battery is</string>
     <string name="cancel">Cancel</string>
 
+    <string name="permission_explanation">To enable automatic screen locking, this permission must be enabled.\nLockTimer does not collect any user information.</string>
+
     <string name="about">About</string>
     <string name="about_app">LockTimer is a tool which can automatically lock your phone\'s screen based from the time, timer, or battery percentage.</string>
 

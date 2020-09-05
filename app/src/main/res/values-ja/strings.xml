@@ -16,6 +16,8 @@
     <string name="notification_text_battery">ロック時間（バッテリー％）：</string>
     <string name="cancel">キャンセル</string>
 
+    <string name="permission_explanation">画面自動ロック機能は動けるためにこのパーミッションが必要です。\nロックタイマーはユーザー情報を収集しません。</string>
+
     <string name="about">アップについて</string>
     <string name="about_app">ロックタイマーは携帯の画面を自動的にロックできるツールです。</string>
 

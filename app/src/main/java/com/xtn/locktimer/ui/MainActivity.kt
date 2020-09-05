@@ -137,8 +137,14 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.setAdminActive(true)
         } else {
             val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN , deviceAdmin)
-                putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "This is needed to enable screen lock feature.")
+                putExtra(
+                    DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                    deviceAdmin
+                )
+                putExtra(
+                    DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                    getString(R.string.permission_explanation)
+                )
             }
             startActivityForResult(
                 intent,
